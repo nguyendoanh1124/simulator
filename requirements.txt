@@ -1,6 +1,6 @@
-os
-requests
-pandas
-datetime
-flask
-gunicorn
+
+
+requests==2.31.0
+pandas==2.1.1
+flask==3.0.0
+gunicorn==20.1.0
