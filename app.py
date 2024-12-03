@@ -2,6 +2,7 @@ import os
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
+import time
 
 CSV_DIRECTORY = "data"
 os.makedirs(CSV_DIRECTORY, exist_ok=True)
@@ -62,6 +63,10 @@ def fetch_transactions(token, from_time, to_time):
     return all_records
 
 def process_and_save_to_csv(data, date_str):
+    if not data:
+        print(f"No transaction data available for {date_str}. Skipping CSV generation.")
+        return
+
     csv_data = []
     for record in data:
         csv_data.append({
@@ -98,4 +103,11 @@ def run_daily_job():
         print(f"Error occurred: {e}")
 
 if __name__ == "__main__":
+    print("Running the first job...")
     run_daily_job()
+
+    while True:
+        print("Sleeping for 1 day...")
+        time.sleep(86400) 
+        print("Running the daily job...")
+        run_daily_job()
