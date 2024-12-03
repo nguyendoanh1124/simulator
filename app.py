@@ -102,12 +102,21 @@ def run_daily_job():
     except Exception as e:
         print(f"Error occurred: {e}")
 
+def calculate_seconds_to_midnight():
+    now = datetime.now()
+    midnight = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    seconds_to_midnight = (midnight - now).total_seconds()
+    return seconds_to_midnight
+
 if __name__ == "__main__":
+    # Run the first job immediately
     print("Running the first job...")
     run_daily_job()
 
     while True:
-        print("Sleeping for 1 day...")
-        time.sleep(86400) 
-        print("Running the daily job...")
+        seconds_to_sleep = calculate_seconds_to_midnight()
+        print(f"Sleeping for {seconds_to_sleep:.0f} seconds until midnight...")
+        time.sleep(seconds_to_sleep)
+
+        print("Running the daily job at midnight...")
         run_daily_job()
