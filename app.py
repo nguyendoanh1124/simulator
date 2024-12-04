@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 from datetime import datetime, timedelta
 import time
+import random
 
 CSV_DIRECTORY = "data"
 os.makedirs(CSV_DIRECTORY, exist_ok=True)
@@ -67,12 +68,33 @@ def process_and_save_to_csv(data, date_str):
         print(f"No transaction data available for {date_str}. Skipping CSV generation.")
         return
 
+    total_records = len(data)
+
+    # Ngẫu nhiên quyết định giữ nguyên hoặc áp dụng ±5% số lượng bản ghi
+    keep_original_count = random.choice([True, False])
+
+    if not keep_original_count:
+        # Randomize number of records (+-5%)
+        variation = int(total_records * 0.05)  # 5% của tổng số bản ghi
+        random_count = total_records + random.randint(-variation, variation)  # Số lượng bản ghi sau khi ngẫu nhiên
+        random_count = max(1, min(random_count, total_records))  # Đảm bảo số lượng không vượt quá giới hạn
+
+        # Chọn ngẫu nhiên các bản ghi
+        sampled_data = random.sample(data, random_count)
+    else:
+        # Giữ nguyên số lượng bản ghi
+        sampled_data = data
+
     csv_data = []
-    for record in data:
+    for record in sampled_data:
+        # Convert CREATE_TIME to desired format
+        raw_time = record["request_time"]
+        formatted_time = datetime.strptime(raw_time, "%Y%m%d%H%M%S").strftime("%Y-%m-%d %H:%M:%S")
+        
         csv_data.append({
             "ID": record["id"],
             "MSG_ID": record["code"],
-            "CREATE_TIME": record["request_time"],
+            "CREATE_TIME": formatted_time,
             "STATUS_MOS": 1 if record["is_valid_id_card"] else 3
         })
 
